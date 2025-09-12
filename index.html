@@ -7,308 +7,347 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDFBF9; /* Very light beige/off-white */
         }
-        .slogan {
-            font-family: 'Dancing Script', cursive;
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
         }
-        .chat-window {
-            scrollbar-width: thin;
-            scrollbar-color: #FBCFE8 #FDFBF9;
-        }
-        .chat-window::-webkit-scrollbar {
-            width: 8px;
-        }
-        .chat-window::-webkit-scrollbar-track {
-            background: #FDFBF9;
-        }
-        .chat-window::-webkit-scrollbar-thumb {
-            background-color: #FBCFE8;
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 18px;
             border-radius: 20px;
-            border: 3px solid #FDFBF9;
+            word-wrap: break-word;
         }
-        .ai-message {
-            background-color: #F1F5F9; /* Lighter Gray */
-            color: #475569;
-            border-bottom-left-radius: 0;
+        .chat-bubble-user {
+            background-color: #fce4ec; /* Rosa pálido */
+            color: #333;
+            border-bottom-right-radius: 4px;
         }
-        .user-message {
-            background-color: #FCE7F3; /* Pastel Pink */
-            color: #9D2449;
-            border-bottom-right-radius: 0;
+        .chat-bubble-ai {
+            background-color: #e3f2fd; /* Celeste pálido */
+            color: #333;
+            border-bottom-left-radius: 4px;
         }
-        .input-glow:focus-within {
-            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.3);
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .btn-send-glow:hover {
-            box-shadow: 0 0 15px rgba(219, 39, 119, 0.4);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .loader {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #6B7280;
-            animation: bounce 1.4s infinite ease-in-out both;
+        /* Estilo para la barra de scroll */
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
         }
-        .loader.dot1 { animation-delay: -0.32s; }
-        .loader.dot2 { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1.0); }
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #d1c4e9;
+            border-radius: 6px;
+        }
+        #chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #b39ddb;
         }
     </style>
 </head>
-<body class="text-slate-700">
+<body class="bg-pink-50 text-gray-800">
 
-    <div id="top-banner" class="bg-white/80 backdrop-blur-sm p-4 text-center sticky top-0 z-10 border-b border-rose-100">
-        <div class="flex items-center justify-center space-x-4">
-            <img src="img/logo.svg" alt="Logo Tati Mapelli" class="h-12" onerror="this.onerror=null;this.src='https://placehold.co/48x48/fdfbf9/db2777?text=TM';">
-            <h1 class="text-3xl font-bold text-slate-800">Cotizador IA</h1>
-        </div>
-        <p class="slogan text-rose-500 text-2xl mt-1">Somos especialistas en repostería</p>
-    </div>
+    <div class="container mx-auto p-4 md:p-8 min-h-screen flex flex-col items-center">
 
-    <div class="flex flex-col h-[calc(100vh-110px)] max-w-2xl mx-auto p-4">
-        
-        <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4">
-            <!-- Mensaje Inicial Fijo -->
-            <div class="flex items-start space-x-3">
-                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex-shrink-0 flex items-center justify-center font-bold">IA</div>
+        <!-- Header -->
+        <header class="w-full max-w-4xl flex items-center justify-between py-6 fade-in">
+            <div class="flex items-center space-x-4">
+                <img src="https://placehold.co/80x80/fce4ec/b39ddb?text=Logo&font=pacifico" alt="Logo Tati Mapelli" class="w-16 h-16 md:w-20 md:h-20 rounded-full">
                 <div>
-                    <div class="max-w-xs md:max-w-md p-3 rounded-xl ai-message">¿Qué producto quieres diseñar hoy?</div>
+                    <h1 class="font-pacifico text-3xl md:text-4xl text-pink-500">Cotizador IA</h1>
+                    <p class="text-sm md:text-md text-gray-500">Somos expertos en repostería</p>
                 </div>
             </div>
-            <!-- Los mensajes dinámicos se insertarán aquí -->
-        </div>
-        
-        <div id="thinking-indicator" class="hidden p-4">
-             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex-shrink-0 flex items-center justify-center font-bold">IA</div>
-                <div class="flex items-center space-x-1.5 p-3 rounded-lg bg-slate-100">
-                    <div class="loader dot1"></div>
-                    <div class="loader dot2"></div>
-                    <div class="loader dot3"></div>
-                </div>
-            </div>
-        </div>
+        </header>
 
-        <footer class="p-2">
-            <div class="flex items-center bg-white rounded-xl p-2 transition-all duration-300 input-glow border border-slate-200 shadow-sm">
-                <input type="text" id="chat-input" placeholder="Describe tu producto aquí..." class="w-full bg-transparent border-none focus:ring-0 text-slate-800 placeholder-slate-400">
-                <button id="send-button" class="bg-rose-600 rounded-lg p-2 ml-2 transition-all duration-300 btn-send-glow hover:bg-rose-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 12h14" />
-                    </svg>
-                </button>
+        <main class="w-full max-w-4xl flex-grow flex flex-col bg-white rounded-2xl shadow-lg mt-4 fade-in" style="animation-delay: 0.2s;">
+            
+            <!-- Chat Interface -->
+            <div class="flex flex-col h-[70vh]">
+                <div id="chat-messages" class="flex-grow p-6 space-y-4 overflow-y-auto">
+                    <!-- Mensaje de bienvenida -->
+                    <div class="flex justify-start">
+                        <div class="chat-bubble chat-bubble-ai">
+                            <p class="font-bold mb-1">Asistente IA de Tati</p>
+                            ¡Hola! Soy el cotizador con IA de Tati Mapelli. ✨ Cuéntame qué producto de repostería o molde te gustaría diseñar y te ayudaré a estimar su costo. ¿Qué creamos juntos hoy?
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                    <div class="flex items-center space-x-3">
+                        <input type="text" id="user-input" class="flex-grow w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-300 transition" placeholder="Describe el producto que necesitas...">
+                        <button id="send-button" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 transition transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </div>
+                    <p id="loading-indicator" class="text-center text-sm text-gray-500 mt-2 hidden">Escribiendo...</p>
+                </div>
             </div>
-        </footer>
+        </main>
+        
+        <!-- Inspiration Section -->
+        <section class="w-full max-w-4xl mt-12 fade-in" style="animation-delay: 0.4s;">
+            <h2 class="font-pacifico text-3xl text-center text-pink-500 mb-8">¿Necesitas inspiración?</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Inspiration Card 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Torta de chocolate decorada">
+                    <div class="p-6">
+                        <p class="text-gray-600">"¡El molde para brownie desmontable es increíble! Mis brownies salen perfectos cada vez. ¡Gracias Tati!"</p>
+                        <p class="text-right font-semibold text-pink-400 mt-2">- Camila R.</p>
+                    </div>
+                </div>
+                <!-- Inspiration Card 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Panqueques apilados">
+                    <div class="p-6">
+                        <p class="text-gray-600">"La panquequera a medida fue un cambio total. Ahora mis creaciones lucen súper profesionales."</p>
+                        <p class="text-right font-semibold text-pink-400 mt-2">- Juan P.</p>
+                    </div>
+                </div>
+                <!-- Inspiration Card 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Macarons de colores">
+                    <div class="p-6">
+                        <p class="text-gray-600">"Pedí un topper personalizado y Tati lo diseñó justo como lo imaginé. ¡La mejor calidad y servicio!"</p>
+                        <p class="text-right font-semibold text-pink-400 mt-2">- Sofía L.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <a href="https://www.instagram.com/" target="_blank" class="text-pink-600 hover:underline">Sigue a Tati en Instagram para más creaciones</a>
+            </div>
+        </section>
+
+        <!-- Floating WhatsApp Button -->
+        <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white rounded-full p-4 shadow-lg hover:bg-green-600 transition transform hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.267.655 4.398 1.908 6.166l-1.295 4.721 4.763-1.254zM9.354 8.114c-.074-.124-.272-.198-.57-.347-.297-.149-.595-.222-.892-.222-.301 0-.547.035-.742.108s-.375.165-.524.275c-.149.11-.25.24-.305.39-.054.15-.082.312-.082.484s.028.348.082.524c.054.176.13.348.229.519.099.171.22.343.364.515.145.172.317.347.515.524l.108.083c.186.14.376.263.57.37.194.107.41.2.65.279.24.078.48.118.72.118.24 0 .48-.04.72-.118.24-.079.455-.177.65-.295.195-.118.365-.25.51-.395.145-.145.26-.304.35-.478.09-.174.135-.355.135-.542 0-.171-.028-.33-.082-.478-.054-.148-.13-.278-.229-.39-.099-.111-.22-.204-.364-.278-.144-.074-.28-.11-.41-.11z"/></svg>
+        </a>
     </div>
-    
-    <a href="https://wa.me/56912345678?text=Hola!%20Me%20gustaría%20hacer%20una%20cotización." target="_blank" rel="noopener noreferrer" id="whatsapp-button" class="fixed bottom-6 right-6 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-transform transform hover:scale-110 z-20">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
-            <path d="M16.6 14.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.7-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.2.4-.4.1-.1.2-.2.2-.4.1-.1.1-.3 0-.4-.1-.1-.6-1.3-.8-1.8-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2 1 2.4c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .1 1.3-.1.4-.2.6-.7.8-.9.2-.2.2-.4.1-.5l-.2-.2zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-        </svg>
-    </a>
 
     <script>
-    const chatWindow = document.getElementById('chat-window');
-    const chatInput = document.getElementById('chat-input');
-    const sendButton = document.getElementById('send-button');
-    const thinkingIndicator = document.getElementById('thinking-indicator');
+        const sendButton = document.getElementById('send-button');
+        const userInput = document.getElementById('user-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const loadingIndicator = document.getElementById('loading-indicator');
 
-    let chatHistory = [];
+        // Historial de la conversación para enviar a la API
+        let conversationHistory = [];
 
-    // --- LÓGICA DE LA CONVERSACIÓN CON GEMINI ---
+        // System prompt con la lógica del negocio
+        const systemPrompt = `
+Eres un asistente de IA experto, amigable y alegre llamado 'Asistente IA de Tati', para la pastelería de Tati Mapelli. Tu objetivo es ayudar a los clientes a cotizar productos personalizados de repostería y moldes, siguiendo una lógica de negocio estricta. Eres cercano, usas emojis ✨🎂 y guías al usuario de forma natural.
 
-    const SYSTEM_PROMPT = `
-        Eres un asistente experto en cotizaciones para Tati Mapelli, una repostera experta. Eres amigable, extremadamente eficiente y tu único objetivo es guiar a los usuarios para definir un producto personalizado y calcular su costo de producción.
+**Reglas Generales:**
+1.  **Objetivo Final:** Siempre debes terminar la conversación entregando dos valores: "Costo de Elaboración" y "Precio de Venta Sugerido".
+2.  **Precio de Venta:** Se calcula siempre como 'Costo de Elaboración' * 1.3.
+3.  **Formato de Respuesta Final:** Al final, presenta la cotización en un formato claro y separado. Por ejemplo:
+    ---
+    ¡Listo! Aquí tienes tu cotización:
+    
+    **Producto:** Molde para Brownie Desmontable (30x20x10 cm)
+    **Costo de Elaboración:** $30.000 CLP
+    **Precio de Venta Sugerido:** $39.000 CLP
+    ---
+4.  **Moneda:** Todos los precios son en pesos chilenos (CLP). Usa el formato $XX.XXX.
+5.  **Flujo de Preguntas:** No pidas toda la información de golpe. Haz una pregunta a la vez, guiando al usuario paso a paso según el producto. Sé conversacional.
 
-        **TU PROCESO OBLIGATORIO:**
-        1.  El primer mensaje ya está fijo en la pantalla y es "¿Qué producto quieres diseñar hoy?". Tu primera respuesta debe reaccionar a la solicitud inicial del usuario.
-        2.  A partir de la respuesta, identificas el producto. Si es un producto estándar (Molde, Panquequera, Varilla, Placa), sigue el proceso estándar. Si es algo diferente, activa el PROCESO EXPERIMENTAL.
-        
-        **PROCESO ESTÁNDAR:**
-        1.  Identificas el producto y haces las preguntas estrictamente necesarias para obtener las especificaciones. SÉ CONCISO.
-        2.  Cuando tengas TODA la información, calculas el costo usando las FÓRMULAS INTERNAS.
-        3.  Respondes ÚNICAMENTE con el objeto JSON final.
+**Lógica de Productos Específicos:**
 
-        **PROCESO EXPERIMENTAL (para productos no listados):**
-        1.  Si el usuario pide un producto que no es de la lista, di: "¡Claro! Podemos intentar cotizar eso. Necesitaré algunos detalles."
-        2.  Pregunta por el material (debe ser aluminio o acrílico).
-        3.  Pide las dimensiones generales (largo, ancho, alto si aplica).
-        4.  Pide una breve descripción de la forma y complejidad (ej: "es una caja simple", "es una forma con muchos cortes").
-        5.  Calcula el costo usando la FÓRMULA EXPERIMENTAL.
-        6.  Responde ÚNICAMENTE con el objeto JSON final, asegurándote de AÑADIR el campo "disclaimer".
+**1. Moldes para Brownies (Aluminio)**
+-   **Disparador:** El usuario menciona "molde", "brownie", "molde para queque".
+-   **Flujo de Preguntas:**
+    1.  Pregunta por las dimensiones: "¡Perfecto! Un molde para brownies. Para empezar, ¿de qué medidas (largo, ancho y alto en cm) lo necesitas?"
+    2.  Pregunta por el tipo: "Genial. ¿Será un molde fijo o desmontable?"
+    3.  Pregunta por divisiones (opcional): "¿Necesitará divisiones internas? Si es así, ¿cuántas a lo largo y cuántas a lo ancho?"
+-   **Lógica de Cálculo:**
+    -   `precioBase` = 30000 (para un molde desmontable de 30x20).
+    -   Si el tipo es "Fijo", `precioBase` = 22500.
+    -   `ajustePorTamano` = ((Largo * Ancho) - 600) * 5. (Solo si es mayor a 600cm²)
+    -   `costoPorDivisiones` = (Cantidad Div. Largo + Cantidad Div. Ancho) * 1250.
+    -   `Costo de Elaboración` = `precioBase` + `ajustePorTamano` + `costoPorDivisiones`.
 
-        **ESTRUCTURA JSON DE RESPUESTA:**
-            {
-              "producto": "Nombre del Producto",
-              "especificaciones": {
-                "Dimensiones": "ej: 30cm x 20cm x 5cm",
-                "Tipo": "ej: Desmontable",
-                "Material": "Aluminio o Acrílico",
-                "Otros": "ej: 3x2 divisiones"
-              },
-              "costo_produccion": 12345,
-              "precio_venta_sugerido": 16050,
-              "disclaimer": "OPCIONAL: Texto del disclaimer si es experimental"
+**2. Panquequeras (Acrílico)**
+-   **Disparador:** El usuario menciona "panquequera".
+-   **Flujo de Preguntas:**
+    1.  Pregunta por la forma: "¡Claro! Una panquequera. ¿La buscas redonda o rectangular?"
+    2.  Pregunta por dimensiones:
+        -   Si es Redonda: "¿De qué diámetro en cm la necesitas?"
+        -   Si es Rectangular: "¿Qué largo y ancho en cm tendría?"
+-   **Lógica de Cálculo:**
+    -   **Redonda:** `Costo de Elaboración` = (625 * Diámetro) - 4250. (Precio mínimo $2.000)
+    -   **Rectangular:**
+        1.  Calcula el `diametroEquivalente` = 2 * Math.sqrt((Largo * Ancho) / Math.PI).
+        2.  Usa la misma fórmula de la redonda: `Costo de Elaboración` = (625 * `diametroEquivalente`) - 4250.
+
+**3. Varillas y Placas (Acrílico)**
+-   **Disparador:** El usuario menciona "varillas" o "placas".
+-   **Flujo de Preguntas:**
+    1.  Pregunta por dimensiones: "¡Entendido! ¿De qué largo y ancho en cm las necesitas?"
+-   **Lógica de Cálculo:**
+    -   **Varillas:** `Costo de Elaboración` = 2500 + (Largo * Ancho * 0.5).
+    -   **Placas:** `Costo de Elaboración` = 1500 + (Largo * Ancho * 2.5).
+
+**4. "Otros Productos" (Modo Experimental)**
+-   **Disparador:** Si no reconoce el producto en las categorías anteriores (ej. "topper", "caja acrílica", "soporte").
+-   **Flujo de Preguntas:**
+    1.  Aclara que es experimental: "¡Qué buena idea! Podemos intentar cotizar eso como un diseño experimental. Necesitaré algunos detalles."
+    2.  Pregunta por el material: "¿De qué material sería, aluminio o acrílico?"
+    3.  Pregunta por dimensiones: "Perfecto. ¿Cuáles serían sus dimensiones aproximadas (largo y ancho en cm)?"
+    4.  Pregunta por complejidad: "Para terminar, ¿podrías darme una breve descripción de su forma? Por ejemplo: 'es una placa con un nombre grabado', 'es una caja con tapa', 'es una silueta compleja'."
+-   **Lógica de Cálculo (Estimación):**
+    -   `costoBaseMaterial`:
+        -   Si es Aluminio: (Largo * Ancho) * 7.5
+        -   Si es Acrílico: (Largo * Ancho) * 4.0
+    -   `factorComplejidad` (evalúa la descripción):
+        -   Simple (placas, cortes rectos): x1.0
+        -   Medio (cajas simples, letras, curvas suaves): x1.5
+        -   Complejo (formas intrincadas, múltiples piezas): x2.0
+    -   `Costo de Elaboración` = `costoBaseMaterial` * `factorComplejidad`.
+-   **Disclaimer Obligatorio:** TODA cotización de "Otros Productos" DEBE terminar con este aviso exacto después de la tarjeta de precios:
+    *Aviso: Este es un diseño experimental, por lo que la cotización es una referencia. ¡Pregúntale a Tati para confirmar el valor final y empezar a crear!*
+`;
+
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (!userText) return;
+
+            appendMessage(userText, 'user');
+            userInput.value = '';
+            conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
+
+            loadingIndicator.classList.remove('hidden');
+            sendButton.disabled = true;
+
+            try {
+                const responseText = await callGeminiAPI(conversationHistory);
+                appendMessage(responseText, 'ai');
+                conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
+
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                appendMessage("¡Ups! Hubo un problema al conectar con el asistente. Por favor, intenta de nuevo más tarde.", 'ai');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                sendButton.disabled = false;
+                userInput.focus();
             }
+        }
 
-        **FÓRMULAS INTERNAS (PRODUCTOS ESTÁNDAR):**
-        * **MOLDES (Aluminio):** Base de $30,000 para desmontable (30x20), 25% menos si es fijo. Costo extra por tamaño: ((largo * ancho) - 600) * 5. Costo por divisiones: (div_largo + div_ancho) * 1250. Total = Base + Tamaño + Divisiones.
-        * **PANQUEQUERAS (Acrílico):** Redonda: (625 * diametro) - 4250 (mínimo $2,000). Rectangular: calcula diámetro equivalente (2 * sqrt((largo * ancho) / PI)) y usa la misma fórmula.
-        * **VARILLAS (Acrílico):** 2500 + (largo * ancho * 0.5).
-        * **PLACAS (Acrílico):** 1500 + (largo * ancho * 2.5).
+        async function callGeminiAPI(history) {
+            const apiKey = "AIzaSyDHs_dpJXr6au8SqSiYRNih5AEvpKOTQ5w";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-        **FÓRMULA EXPERIMENTAL (OTROS PRODUCTOS):**
-        * Calcula el área base (largo * ancho).
-        * Costo por material: Si es Aluminio, área * 7.5. Si es Acrílico, área * 4.
-        * Factor de complejidad: Infiere un factor de 1.0 (simple), 1.5 (medio), o 2.0 (complejo) basado en la descripción del usuario.
-        * **Costo Total Experimental = Costo por material * Factor de complejidad.**
-        * **IMPORTANTE:** Para estos productos, el JSON DEBE incluir: "disclaimer": "Este es un diseño experimental, la cotización es una referencia. Pregúntale a Tati para confirmar el valor".
+            const payload = {
+                contents: history,
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 1,
+                    topK: 1,
+                }
+            };
+            
+            // Implementación de reintentos con backoff exponencial
+            let response;
+            let retries = 3;
+            let delay = 1000;
+            while (retries > 0) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
 
-        **CÁLCULO DE PRECIO DE VENTA (PARA TODOS):**
-        * precio_venta_sugerido = costo_produccion * 1.3
-    `;
-
-    async function getAiResponse() {
-        thinkingIndicator.classList.remove('hidden');
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-
-        const apiKey = "AIzaSyDHs_dpJXr6au8SqSiYRNih5AEvpKOTQ5w"; // Canvas se encarga de la API Key
-        const apiUrl = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}\`;
-
-        const payload = {
-            contents: chatHistory,
-            systemInstruction: {
-                parts: [{ text: SYSTEM_PROMPT }]
-            },
-        };
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error(\`API error: ${response.statusText}\`);
+                    if (response.ok) {
+                        break; 
+                    } else if (response.status === 429 || response.status >= 500) {
+                        console.warn(`API call failed with status ${response.status}. Retrying in ${delay / 1000}s...`);
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                        retries--;
+                    } else {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+                } catch (error) {
+                     if (retries === 1) { throw error; }
+                    console.warn(`Fetch error: ${error.message}. Retrying in ${delay / 1000}s...`);
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                    retries--;
+                }
+            }
+             
+            if (!response || !response.ok) {
+                throw new Error(`API call failed after multiple retries.`);
             }
 
             const result = await response.json();
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            
+            const candidate = result.candidates?.[0];
+            const text = candidate?.content?.parts?.[0]?.text;
+
             if (text) {
-                handleResponse(text);
+                 return text;
             } else {
-                 addMessage("Lo siento, no pude procesar tu solicitud. Inténtalo de nuevo.", 'ai');
+                console.error("Respuesta inesperada o bloqueada de la API:", JSON.stringify(result, null, 2));
+                const finishReason = candidate?.finishReason;
+                if (finishReason === 'SAFETY') {
+                    return "Mi política de seguridad me impide continuar. ¿Podemos hablar de otro producto?";
+                }
+                return "No he podido procesar tu solicitud. Por favor, intenta con otras palabras.";
             }
-
-        } catch (error) {
-            console.error("Error fetching AI response:", error);
-            addMessage("Error de conexión. Por favor, revisa tu conexión e inténtalo de nuevo.", 'ai');
-        } finally {
-            thinkingIndicator.classList.add('hidden');
         }
-    }
 
-    function handleResponse(text) {
-        chatHistory.push({ role: "model", parts: [{ text }] });
-        
-        try {
-            const data = JSON.parse(text);
-            displayQuote(data);
-        } catch (e) {
-            addMessage(text, 'ai');
-        }
-    }
-    
-    function displayQuote(data) {
-        const { producto, especificaciones, costo_produccion, precio_venta_sugerido, disclaimer } = data;
-        
-        let specHtml = Object.entries(especificaciones)
-            .filter(([_, value]) => value && value !== "N/A" && value !== "")
-            .map(([key, value]) => \`<p class="text-sm"><span class="font-semibold text-slate-500">${key}:</span> ${value}</p>\`)
-            .join('');
+        function appendMessage(text, sender) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start', 'fade-in');
+
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('chat-bubble', sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai');
+
+            if(sender === 'ai') {
+                const aiHeader = document.createElement('p');
+                aiHeader.classList.add('font-bold', 'mb-1');
+                aiHeader.textContent = 'Asistente IA de Tati';
+                messageBubble.appendChild(aiHeader);
+            }
             
-        const disclaimerHtml = disclaimer 
-            ? \`<div class="mt-3 p-2 text-xs text-center bg-amber-100 text-amber-800 rounded-md font-semibold">${disclaimer}</div>\` 
-            : '';
+            // Procesar el texto para convertir markdown simple a HTML
+            let processedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/---/g, '<hr class="my-3 border-pink-200">');
 
-        const quoteHtml = \`
-            <div class="border border-rose-200 bg-white p-4 rounded-lg space-y-3">
-                <h3 class="font-bold text-lg text-rose-600">¡Cotización Lista!</h3>
-                <p class="font-bold text-slate-800">${producto}</p>
-                <div class="space-y-1">${specHtml}</div>
-                <div class="pt-3 mt-3 border-t border-rose-100 text-center">
-                    <p class="text-xs text-slate-500">Costo de Elaboración</p>
-                    <p class="text-2xl font-bold text-slate-800">${formatCurrency(costo_produccion)}</p>
-                    <p class="text-xs text-slate-500 mt-2">Precio Venta Sugerido (con 30% margen)</p>
-                    <p class="text-lg font-bold text-rose-600">${formatCurrency(precio_venta_sugerido)}</p>
-                </div>
-                ${disclaimerHtml}
-            </div>
-            <p class="text-sm mt-2 text-slate-600">¿Quieres cotizar otro producto?</p>
-        \`;
-        addMessage(quoteHtml, 'ai', true);
-    }
-    
-    function addMessage(text, sender, isHtml = false) {
-        const messageWrapper = document.createElement('div');
-        messageWrapper.className = \`flex items-start space-x-3 ${sender === 'user' ? 'justify-end' : ''}\`;
-        
-        const icon = \`<div class="w-10 h-10 rounded-full ${sender === 'user' ? 'bg-rose-600 text-white' : 'bg-rose-100 text-rose-700'} flex-shrink-0 flex items-center justify-center font-bold">${sender === 'user' ? 'Tú' : 'IA'}</div>\`;
-        const messageBubble = document.createElement('div');
-        messageBubble.className = \`max-w-xs md:max-w-md p-3 rounded-xl ${sender === 'user' ? 'user-message' : 'ai-message'}\`;
-        
-        if (isHtml) {
-            messageBubble.innerHTML = text;
-        } else {
-            messageBubble.textContent = text;
+            const messageContent = document.createElement('div');
+            messageContent.innerHTML = processedText;
+            messageBubble.appendChild(messageContent);
+            
+            messageWrapper.appendChild(messageBubble);
+            chatMessages.appendChild(messageWrapper);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        if (sender === 'user') {
-            messageWrapper.innerHTML = \`<div>${messageBubble.outerHTML}</div> ${icon}\`;
-        } else {
-            messageWrapper.innerHTML = \`${icon} <div>${messageBubble.outerHTML}</div>\`;
-        }
-        
-        chatWindow.appendChild(messageWrapper);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-
-    function handleUserInput() {
-        const message = chatInput.value.trim();
-        if (!message) return;
-
-        addMessage(message, 'user');
-        chatInput.value = '';
-
-        chatHistory.push({ role: "user", parts: [{ text: message }] });
-        getAiResponse();
-    }
-    
-    function formatCurrency(value) {
-        const roundedValue = Math.round(value / 10) * 10;
-        return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(roundedValue);
-    }
-
-    sendButton.addEventListener('click', handleUserInput);
-    chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            handleUserInput();
-        }
-    });
-    
-    // Inicialización del Chat
-    const initialMessage = "¿Qué producto quieres diseñar hoy?";
-    // El mensaje inicial ya está en el HTML, solo lo agregamos al historial para que el modelo tenga contexto.
-    chatHistory.push({ role: "model", parts: [{ text: initialMessage }] });
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
 
     </script>
 </body>
