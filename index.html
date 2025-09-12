@@ -75,7 +75,14 @@
     <div class="flex flex-col h-[calc(100vh-110px)] max-w-2xl mx-auto p-4">
         
         <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4">
-            <!-- Los mensajes del chat se insertarán aquí -->
+            <!-- Mensaje Inicial Fijo -->
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex-shrink-0 flex items-center justify-center font-bold">IA</div>
+                <div>
+                    <div class="max-w-xs md:max-w-md p-3 rounded-xl ai-message">¿Qué producto quieres diseñar hoy?</div>
+                </div>
+            </div>
+            <!-- Los mensajes dinámicos se insertarán aquí -->
         </div>
         
         <div id="thinking-indicator" class="hidden p-4">
@@ -121,7 +128,7 @@
         Eres un asistente experto en cotizaciones para Tati Mapelli, una repostera experta. Eres amigable, extremadamente eficiente y tu único objetivo es guiar a los usuarios para definir un producto personalizado y calcular su costo de producción.
 
         **TU PROCESO OBLIGATORIO:**
-        1.  Comienzas siempre preguntando "¿Qué producto quieres crear hoy?".
+        1.  El primer mensaje ya está fijo en la pantalla y es "¿Qué producto quieres diseñar hoy?". Tu primera respuesta debe reaccionar a la solicitud inicial del usuario.
         2.  A partir de la respuesta, identificas el producto. Si es un producto estándar (Molde, Panquequera, Varilla, Placa), sigue el proceso estándar. Si es algo diferente, activa el PROCESO EXPERIMENTAL.
         
         **PROCESO ESTÁNDAR:**
@@ -298,10 +305,12 @@
         }
     });
     
-    const initialMessage = "¿Qué producto quieres crear hoy?";
-    addMessage(initialMessage, 'ai');
+    // Inicialización del Chat
+    const initialMessage = "¿Qué producto quieres diseñar hoy?";
+    // El mensaje inicial ya está en el HTML, solo lo agregamos al historial para que el modelo tenga contexto.
     chatHistory.push({ role: "model", parts: [{ text: initialMessage }] });
 
     </script>
 </body>
 </html>
+
