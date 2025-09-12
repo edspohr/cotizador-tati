@@ -152,6 +152,9 @@
 
         * **PLACAS (Acrílico):**
             * Fórmula de costo: '1500 + (largo * ancho * 2.5)'.
+
+        * **OTROS PRODUCTOS:**
+            * Pide una breve descripción y aplica una lógica consistente en términos de evaluar el potencial tiempo que tomaría el desarrollo y aplicar un precio que estimes coherente de acuerdo a la información que tienes.
         
         **CÁLCULO DE PRECIO DE VENTA FINAL:**
         * Una vez que tengas el 'costo_produccion', calcula el 'precio_venta_sugerido' aplicando un 30% de margen.
@@ -162,7 +165,7 @@
         thinkingIndicator.classList.remove('hidden');
         chatWindow.scrollTop = chatWindow.scrollHeight;
 
-        const apiKey = ""; // Canvas se encarga de la API Key
+        const apiKey = "AIzaSyDHs_dpJXr6au8SqSiYRNih5AEvpKOTQ5w"; // Canvas se encarga de la API Key
         const apiUrl = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}\`;
 
         const payload = {
