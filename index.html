@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador IA - Tati Mapelli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF9; /* Very light beige/off-white */
+        }
+        .slogan {
+            font-family: 'Dancing Script', cursive;
+        }
+        .chat-window {
+            scrollbar-width: thin;
+            scrollbar-color: #FBCFE8 #FDFBF9;
+        }
+        .chat-window::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-window::-webkit-scrollbar-track {
+            background: #FDFBF9;
+        }
+        .chat-window::-webkit-scrollbar-thumb {
+            background-color: #FBCFE8;
+            border-radius: 20px;
+            border: 3px solid #FDFBF9;
+        }
+        .ai-message {
+            background-color: #F1F5F9; /* Lighter Gray */
+            color: #475569;
+            border-bottom-left-radius: 0;
+        }
+        .user-message {
+            background-color: #FCE7F3; /* Pastel Pink */
+            color: #9D2449;
+            border-bottom-right-radius: 0;
+        }
+        .input-glow:focus-within {
+            box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.3);
+        }
+        .btn-send-glow:hover {
+            box-shadow: 0 0 15px rgba(219, 39, 119, 0.4);
+        }
+        .loader {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6B7280;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loader.dot1 { animation-delay: -0.32s; }
+        .loader.dot2 { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div id="top-banner" class="bg-white/80 backdrop-blur-sm p-4 text-center sticky top-0 z-10 border-b border-rose-100">
+        <img src="img/logo.png" alt="Logo Tati Mapelli" class="h-14 mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/180x56/fdfbf9/db2777?text=Tati+Mapelli';">
+        <p class="slogan text-rose-600 text-3xl mt-2">Somos especialistas en repostería</p>
+    </div>
+
+    <div class="flex flex-col h-[calc(100vh-125px)] max-w-2xl mx-auto p-4">
+        
+        <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- Los mensajes del chat se insertarán aquí -->
+        </div>
+        
+        <div id="thinking-indicator" class="hidden p-4">
+             <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex-shrink-0 flex items-center justify-center font-bold">IA</div>
+                <div class="flex items-center space-x-1.5 p-3 rounded-lg bg-slate-100">
+                    <div class="loader dot1"></div>
+                    <div class="loader dot2"></div>
+                    <div class="loader dot3"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="p-2">
+            <div class="flex items-center bg-white rounded-xl p-2 transition-all duration-300 input-glow border border-slate-200 shadow-sm">
+                <input type="text" id="chat-input" placeholder="Describe tu producto aquí..." class="w-full bg-transparent border-none focus:ring-0 text-slate-800 placeholder-slate-400">
+                <button id="send-button" class="bg-rose-600 rounded-lg p-2 ml-2 transition-all duration-300 btn-send-glow hover:bg-rose-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 12h14" />
+                    </svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+    
+    <a href="https://wa.me/56912345678?text=Hola!%20Me%20gustaría%20hacer%20una%20cotización." target="_blank" rel="noopener noreferrer" id="whatsapp-button" class="fixed bottom-6 right-6 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-transform transform hover:scale-110 z-20">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+            <path d="M16.6 14.2c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.7-.8.9-.1.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.2.4-.4.1-.1.2-.2.2-.4.1-.1.1-.3 0-.4-.1-.1-.6-1.3-.8-1.8-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2 1 2.4c.1.1 1.5 2.3 3.7 3.2.5.2.9.4 1.2.5.5.2 1 .1 1.3-.1.4-.2.6-.7.8-.9.2-.2.2-.4.1-.5l-.2-.2zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
+        </svg>
+    </a>
+
+    <script>
+    const chatWindow = document.getElementById('chat-window');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const thinkingIndicator = document.getElementById('thinking-indicator');
+
+    let chatHistory = [];
+
+    // --- LÓGICA DE LA CONVERSACIÓN CON GEMINI ---
+
+    const SYSTEM_PROMPT = `
+        Eres un asistente experto en cotizaciones para Tati Mapelli, una repostera experta. Eres amigable, extremadamente eficiente y tu único objetivo es guiar a los usuarios para definir un producto personalizado y calcular su costo de producción.
+
+        **TU PROCESO OBLIGATORIO:**
+        1.  Comienzas siempre preguntando "¿Qué producto quieres crear hoy?".
+        2.  A partir de la respuesta, identificas el producto (Molde, Panquequera, Varilla, Placa) y haces las preguntas estrictamente necesarias para obtener las especificaciones. SÉ CONCISO. No pidas información que no necesitas para el cálculo.
+        3.  Cuando tengas TODA la información para un producto, y solo en ese momento, calcularás el costo de producción usando las fórmulas internas.
+        4.  **TU ÚNICA RESPUESTA FINAL DEBE SER UN OBJETO JSON VÁLIDO.** No agregues texto antes o después del JSON. El JSON debe tener esta estructura:
+            {
+              "producto": "Nombre del Producto",
+              "especificaciones": {
+                "Dimensiones": "ej: 30cm x 20cm x 5cm",
+                "Tipo": "ej: Desmontable",
+                "Material": "Aluminio o Acrílico",
+                "Otros": "ej: 3x2 divisiones"
+              },
+              "costo_produccion": 12345,
+              "precio_venta_sugerido": 16050
+            }
+
+        **FÓRMULAS INTERNAS PARA CÁLCULO DE COSTO DE PRODUCCIÓN (Usa estas reglas, son tu única fuente de verdad):**
+
+        * **MOLDES (Aluminio):**
+            * Precio base para un molde desmontable estándar (30x20cm): $30,000 CLP.
+            * Si el tipo es 'Fijo', el precio base es 25% más barato ($22,500 CLP).
+            * Costo por tamaño: ( (largo * ancho) - 600 ) * 5. (Se cobra $5 por cada cm² que exceda el tamaño estándar de 600cm²).
+            * Costo por divisiones: (cantidad de divisiones en largo + cantidad en ancho) * 1250.
+            * **Costo Total Molde = Precio Base + Costo por Tamaño + Costo por Divisiones.**
+
+        * **PANQUEQUERAS (Acrílico):**
+            * Si es redonda: Usa la fórmula 'costo = (625 * diametro) - 4250'. El costo mínimo es $2,000.
+            * Si es rectangular: Calcula un diámetro equivalente usando '(2 * Math.sqrt((largo * ancho) / Math.PI))' y aplica la misma fórmula de la panquequera redonda.
+
+        * **VARILLAS (Acrílico):**
+            * Fórmula de costo: '2500 + (largo * ancho * 0.5)'.
+
+        * **PLACAS (Acrílico):**
+            * Fórmula de costo: '1500 + (largo * ancho * 2.5)'.
+        
+        **CÁLCULO DE PRECIO DE VENTA FINAL:**
+        * Una vez que tengas el 'costo_produccion', calcula el 'precio_venta_sugerido' aplicando un 30% de margen.
+        * Fórmula: precio_venta_sugerido = costo_produccion * 1.3
+    `;
+
+    async function getAiResponse() {
+        thinkingIndicator.classList.remove('hidden');
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        const apiKey = ""; // Canvas se encarga de la API Key
+        const apiUrl = \`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}\`;
+
+        const payload = {
+            contents: chatHistory,
+            systemInstruction: {
+                parts: [{ text: SYSTEM_PROMPT }]
+            },
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(\`API error: ${response.statusText}\`);
+            }
+
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (text) {
+                handleResponse(text);
+            } else {
+                 addMessage("Lo siento, no pude procesar tu solicitud. Inténtalo de nuevo.", 'ai');
+            }
+
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            addMessage("Error de conexión. Por favor, revisa tu conexión e inténtalo de nuevo.", 'ai');
+        } finally {
+            thinkingIndicator.classList.add('hidden');
+        }
+    }
+
+    function handleResponse(text) {
+        chatHistory.push({ role: "model", parts: [{ text }] });
+        
+        try {
+            const data = JSON.parse(text);
+            displayQuote(data);
+        } catch (e) {
+            addMessage(text, 'ai');
+        }
+    }
+    
+    function displayQuote(data) {
+        const { producto, especificaciones, costo_produccion, precio_venta_sugerido } = data;
+        
+        let specHtml = Object.entries(especificaciones)
+            .filter(([_, value]) => value && value !== "N/A" && value !== "")
+            .map(([key, value]) => \`<p class="text-sm"><span class="font-semibold text-slate-500">${key}:</span> ${value}</p>\`)
+            .join('');
+
+        const quoteHtml = \`
+            <div class="border border-rose-200 bg-white p-4 rounded-lg space-y-3">
+                <h3 class="font-bold text-lg text-rose-600">¡Cotización Lista!</h3>
+                <p class="font-bold text-slate-800">${producto}</p>
+                <div class="space-y-1">${specHtml}</div>
+                <div class="pt-3 mt-3 border-t border-rose-100 text-center">
+                    <p class="text-xs text-slate-500">Costo de Elaboración</p>
+                    <p class="text-2xl font-bold text-slate-800">${formatCurrency(costo_produccion)}</p>
+                    <p class="text-xs text-slate-500 mt-2">Precio Venta Sugerido (con 30% margen)</p>
+                    <p class="text-lg font-bold text-rose-600">${formatCurrency(precio_venta_sugerido)}</p>
+                </div>
+            </div>
+            <p class="text-sm mt-2 text-slate-600">¿Quieres cotizar otro producto?</p>
+        \`;
+        addMessage(quoteHtml, 'ai', true);
+    }
+    
+    function addMessage(text, sender, isHtml = false) {
+        const messageWrapper = document.createElement('div');
+        messageWrapper.className = \`flex items-start space-x-3 ${sender === 'user' ? 'justify-end' : ''}\`;
+        
+        const icon = \`<div class="w-10 h-10 rounded-full ${sender === 'user' ? 'bg-rose-600 text-white' : 'bg-rose-100 text-rose-700'} flex-shrink-0 flex items-center justify-center font-bold">${sender === 'user' ? 'Tú' : 'IA'}</div>\`;
+        const messageBubble = document.createElement('div');
+        messageBubble.className = \`max-w-xs md:max-w-md p-3 rounded-xl ${sender === 'user' ? 'user-message' : 'ai-message'}\`;
+        
+        if (isHtml) {
+            messageBubble.innerHTML = text;
+        } else {
+            messageBubble.textContent = text;
+        }
+
+        if (sender === 'user') {
+            messageWrapper.innerHTML = \`<div>${messageBubble.outerHTML}</div> ${icon}\`;
+        } else {
+            messageWrapper.innerHTML = \`${icon} <div>${messageBubble.outerHTML}</div>\`;
+        }
+        
+        chatWindow.appendChild(messageWrapper);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function handleUserInput() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        chatInput.value = '';
+
+        chatHistory.push({ role: "user", parts: [{ text: message }] });
+        getAiResponse();
+    }
+    
+    function formatCurrency(value) {
+        const roundedValue = Math.round(value / 10) * 10;
+        return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(roundedValue);
+    }
+
+    sendButton.addEventListener('click', handleUserInput);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            handleUserInput();
+        }
+    });
+    
+    const initialMessage = "¿Qué producto quieres crear hoy?";
+    addMessage(initialMessage, 'ai');
+    chatHistory.push({ role: "model", parts: [{ text: initialMessage }] });
+
+    </script>
+</body>
+</html>
+
