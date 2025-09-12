@@ -65,11 +65,14 @@
 <body class="text-slate-700">
 
     <div id="top-banner" class="bg-white/80 backdrop-blur-sm p-4 text-center sticky top-0 z-10 border-b border-rose-100">
-        <img src="img/logo.svg" alt="Logo Tati Mapelli" class="h-14 mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/180x56/fdfbf9/db2777?text=Tati+Mapelli';">
-        <p class="slogan text-rose-600 text-3xl mt-2">Cotizador IA<br>Somos especialistas en repostería</p>
+        <div class="flex items-center justify-center space-x-4">
+            <img src="img/logo.svg" alt="Logo Tati Mapelli" class="h-12" onerror="this.onerror=null;this.src='https://placehold.co/48x48/fdfbf9/db2777?text=TM';">
+            <h1 class="text-3xl font-bold text-slate-800">Cotizador IA</h1>
+        </div>
+        <p class="slogan text-rose-500 text-2xl mt-1">Somos especialistas en repostería</p>
     </div>
 
-    <div class="flex flex-col h-[calc(100vh-125px)] max-w-2xl mx-auto p-4">
+    <div class="flex flex-col h-[calc(100vh-110px)] max-w-2xl mx-auto p-4">
         
         <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-4">
             <!-- Los mensajes del chat se insertarán aquí -->
@@ -119,9 +122,22 @@
 
         **TU PROCESO OBLIGATORIO:**
         1.  Comienzas siempre preguntando "¿Qué producto quieres crear hoy?".
-        2.  A partir de la respuesta, identificas el producto (Molde, Panquequera, Varilla, Placa) y haces las preguntas estrictamente necesarias para obtener las especificaciones. SÉ CONCISO. No pidas información que no necesitas para el cálculo.
-        3.  Cuando tengas TODA la información para un producto, y solo en ese momento, calcularás el costo de producción usando las fórmulas internas.
-        4.  **TU ÚNICA RESPUESTA FINAL DEBE SER UN OBJETO JSON VÁLIDO.** No agregues texto antes o después del JSON. El JSON debe tener esta estructura:
+        2.  A partir de la respuesta, identificas el producto. Si es un producto estándar (Molde, Panquequera, Varilla, Placa), sigue el proceso estándar. Si es algo diferente, activa el PROCESO EXPERIMENTAL.
+        
+        **PROCESO ESTÁNDAR:**
+        1.  Identificas el producto y haces las preguntas estrictamente necesarias para obtener las especificaciones. SÉ CONCISO.
+        2.  Cuando tengas TODA la información, calculas el costo usando las FÓRMULAS INTERNAS.
+        3.  Respondes ÚNICAMENTE con el objeto JSON final.
+
+        **PROCESO EXPERIMENTAL (para productos no listados):**
+        1.  Si el usuario pide un producto que no es de la lista, di: "¡Claro! Podemos intentar cotizar eso. Necesitaré algunos detalles."
+        2.  Pregunta por el material (debe ser aluminio o acrílico).
+        3.  Pide las dimensiones generales (largo, ancho, alto si aplica).
+        4.  Pide una breve descripción de la forma y complejidad (ej: "es una caja simple", "es una forma con muchos cortes").
+        5.  Calcula el costo usando la FÓRMULA EXPERIMENTAL.
+        6.  Responde ÚNICAMENTE con el objeto JSON final, asegurándote de AÑADIR el campo "disclaimer".
+
+        **ESTRUCTURA JSON DE RESPUESTA:**
             {
               "producto": "Nombre del Producto",
               "especificaciones": {
@@ -131,34 +147,25 @@
                 "Otros": "ej: 3x2 divisiones"
               },
               "costo_produccion": 12345,
-              "precio_venta_sugerido": 16050
+              "precio_venta_sugerido": 16050,
+              "disclaimer": "OPCIONAL: Texto del disclaimer si es experimental"
             }
 
-        **FÓRMULAS INTERNAS PARA CÁLCULO DE COSTO DE PRODUCCIÓN (Usa estas reglas, son tu única fuente de verdad):**
+        **FÓRMULAS INTERNAS (PRODUCTOS ESTÁNDAR):**
+        * **MOLDES (Aluminio):** Base de $30,000 para desmontable (30x20), 25% menos si es fijo. Costo extra por tamaño: ((largo * ancho) - 600) * 5. Costo por divisiones: (div_largo + div_ancho) * 1250. Total = Base + Tamaño + Divisiones.
+        * **PANQUEQUERAS (Acrílico):** Redonda: (625 * diametro) - 4250 (mínimo $2,000). Rectangular: calcula diámetro equivalente (2 * sqrt((largo * ancho) / PI)) y usa la misma fórmula.
+        * **VARILLAS (Acrílico):** 2500 + (largo * ancho * 0.5).
+        * **PLACAS (Acrílico):** 1500 + (largo * ancho * 2.5).
 
-        * **MOLDES (Aluminio):**
-            * Precio base para un molde desmontable estándar (30x20cm): $30,000 CLP.
-            * Si el tipo es 'Fijo', el precio base es 25% más barato ($22,500 CLP).
-            * Costo por tamaño: ( (largo * ancho) - 600 ) * 5. (Se cobra $5 por cada cm² que exceda el tamaño estándar de 600cm²).
-            * Costo por divisiones: (cantidad de divisiones en largo + cantidad en ancho) * 1250.
-            * **Costo Total Molde = Precio Base + Costo por Tamaño + Costo por Divisiones.**
+        **FÓRMULA EXPERIMENTAL (OTROS PRODUCTOS):**
+        * Calcula el área base (largo * ancho).
+        * Costo por material: Si es Aluminio, área * 7.5. Si es Acrílico, área * 4.
+        * Factor de complejidad: Infiere un factor de 1.0 (simple), 1.5 (medio), o 2.0 (complejo) basado en la descripción del usuario.
+        * **Costo Total Experimental = Costo por material * Factor de complejidad.**
+        * **IMPORTANTE:** Para estos productos, el JSON DEBE incluir: "disclaimer": "Este es un diseño experimental, la cotización es una referencia. Pregúntale a Tati para confirmar el valor".
 
-        * **PANQUEQUERAS (Acrílico):**
-            * Si es redonda: Usa la fórmula 'costo = (625 * diametro) - 4250'. El costo mínimo es $2,000.
-            * Si es rectangular: Calcula un diámetro equivalente usando '(2 * Math.sqrt((largo * ancho) / Math.PI))' y aplica la misma fórmula de la panquequera redonda.
-
-        * **VARILLAS (Acrílico):**
-            * Fórmula de costo: '2500 + (largo * ancho * 0.5)'.
-
-        * **PLACAS (Acrílico):**
-            * Fórmula de costo: '1500 + (largo * ancho * 2.5)'.
-
-        * **OTROS PRODUCTOS:**
-            * Pide una breve descripción y aplica una lógica consistente en términos de evaluar el potencial tiempo que tomaría el desarrollo y aplicar un precio que estimes coherente de acuerdo a la información que tienes.
-        
-        **CÁLCULO DE PRECIO DE VENTA FINAL:**
-        * Una vez que tengas el 'costo_produccion', calcula el 'precio_venta_sugerido' aplicando un 30% de margen.
-        * Fórmula: precio_venta_sugerido = costo_produccion * 1.3
+        **CÁLCULO DE PRECIO DE VENTA (PARA TODOS):**
+        * precio_venta_sugerido = costo_produccion * 1.3
     `;
 
     async function getAiResponse() {
@@ -215,12 +222,16 @@
     }
     
     function displayQuote(data) {
-        const { producto, especificaciones, costo_produccion, precio_venta_sugerido } = data;
+        const { producto, especificaciones, costo_produccion, precio_venta_sugerido, disclaimer } = data;
         
         let specHtml = Object.entries(especificaciones)
             .filter(([_, value]) => value && value !== "N/A" && value !== "")
             .map(([key, value]) => \`<p class="text-sm"><span class="font-semibold text-slate-500">${key}:</span> ${value}</p>\`)
             .join('');
+            
+        const disclaimerHtml = disclaimer 
+            ? \`<div class="mt-3 p-2 text-xs text-center bg-amber-100 text-amber-800 rounded-md font-semibold">${disclaimer}</div>\` 
+            : '';
 
         const quoteHtml = \`
             <div class="border border-rose-200 bg-white p-4 rounded-lg space-y-3">
@@ -233,6 +244,7 @@
                     <p class="text-xs text-slate-500 mt-2">Precio Venta Sugerido (con 30% margen)</p>
                     <p class="text-lg font-bold text-rose-600">${formatCurrency(precio_venta_sugerido)}</p>
                 </div>
+                ${disclaimerHtml}
             </div>
             <p class="text-sm mt-2 text-slate-600">¿Quieres cotizar otro producto?</p>
         \`;
@@ -293,4 +305,3 @@
     </script>
 </body>
 </html>
-
