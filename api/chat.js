@@ -4,7 +4,7 @@
 // It receives the chat history from the frontend, adds the secret API key,
 // calls the Gemini API, and then sends the response back to the frontend.
 
-export default async function handler(request, response) {
+module.exports = async (request, response) => {
   console.log("--- API Function Started ---");
 
   // Only allow POST requests
@@ -148,4 +148,4 @@ Eres un asistente de IA experto, amigable y alegre llamado 'Asistente IA de Tati
     console.error(error);
     response.status(500).json({ error: 'An internal server error occurred.' });
   }
-}
+};
