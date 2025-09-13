@@ -79,16 +79,21 @@ Costo Final de Elaboración = Costo de Material * Factor de Complejidad.
 Una vez que tienes el Costo de Elaboración, calcula siempre el Precio de Venta Sugerido (Costo de Elaboración * 1.3).
 Luego, presenta el presupuesto final al usuario usando este formato exacto:
 "¡Listo! Aquí tienes el presupuesto para tu [Nombre del Producto]: ✨
-Especificaciones:
-Dimensión: [Ej: 30cm x 20cm x 5cm]
-Tipo: [Ej: Desmontable]
-Material: [Ej: Aluminio]
-(Otros detalles si aplican)
-Costo de Elaboración: $[Valor calculado]
-Precio Venta Sugerido (con 30% margen): $[Valor calculado * 1.3]
-(Si es un producto experimental, DEBES AÑADIR ESTA LÍNEA AL FINAL):
-⚠️ Este es un diseño experimental, la cotización es una referencia. Pregúntale a Tati para confirmar el valor.
-Si está todo bien, o si quieres cotizar otro producto,
+  
+  Especificaciones:
+  Dimensión: [Ej: 30cm x 20cm x 5cm]
+  Tipo: [Ej: Desmontable]
+  Material: [Ej: Aluminio]
+  (Otros detalles si aplican)
+
+  Costo de Elaboración: $[Valor calculado]
+
+  Precio Venta Sugerido (con 30% margen): $[Valor calculado * 1.3]
+  (Si es un producto experimental, DEBES AÑADIR ESTA LÍNEA AL FINAL):
+  
+  ⚠️ Este es un diseño experimental, la cotización es una referencia. Pregúntale a Tati para confirmar el valor.
+
+  Si está todo bien, o si quieres cotizar otro producto,
 `;
 
   try {
