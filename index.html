@@ -8,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-                body {
+        body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(170deg, #fff0f5 0%, #fdfcff 100%);
         }
@@ -41,15 +41,17 @@
             transform: translateY(15px);
             animation: popIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
+        /* High-contrast user bubble */
         .chat-bubble-user {
-            background-color: #f8bbd0;
-            color: #4a2330;
+            background-color: #ec4899; /* Vibrant pink */
+            color: #ffffff; /* White text */
             border-bottom-right-radius: 6px;
         }
+        /* High-contrast AI bubble */
         .chat-bubble-ai {
             background-color: #ffffff;
-            color: #333;
-            border: 1px solid #f0f0f0;
+            color: #1f2937; /* Darker gray text */
+            border: 1px solid #e5e7eb; /* Slightly darker border */
             border-bottom-left-radius: 6px;
         }
         @keyframes popIn {
@@ -92,37 +94,38 @@
         }
     </style>
 </head>
-<body class="bg-pink-50 text-gray-800">
+<body class="text-gray-700">
+    <div id="particles-js"></div>
 
-    <div class="container mx-auto p-4 md:p-8 min-h-screen flex flex-col items-center">
+    <div class="container mx-auto p-4 md:p-8 min-h-screen flex flex-col items-center relative z-10">
 
-        <header class="w-full max-w-4xl flex items-center justify-between py-6 fade-in">
-            <div class="flex items-center space-x-4">
-                <img src="img/logo.svg" alt="Logo Tati Mapelli" class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-4 border-white shadow-md">
-                <div>
-                    <h1 class="font-pacifico text-3xl md:text-4xl text-pink-500">Cotizador IA</h1>
-                    <p class="text-sm md:text-md text-gray-500">Somos expertos en repostería</p>
-                </div>
-            </div>
+        <header class="w-full max-w-4xl flex flex-col items-center text-center py-8">
+            <img src="img/logo.svg" alt="Logo Tati Mapelli" class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-4 border-white shadow-md">
+            <h1 class="font-playfair text-4xl md:text-5xl text-gray-800">Cotizador IA de Tati Mapelli</h1>
+            <p class="text-md text-gray-500 mt-2">Diseños dulces, creados a tu medida con ayuda de la IA ✨</p>
         </header>
 
-        <main class="w-full max-w-4xl flex-grow flex flex-col bg-white rounded-2xl shadow-lg mt-4 fade-in" style="animation-delay: 0.2s;">
+        <main class="w-full max-w-3xl flex-grow flex flex-col bg-white/70 backdrop-blur-sm rounded-2xl chat-container mt-4">
             
-            <div class="flex flex-col h-[70vh]">
+            <div class="chat-header p-4 rounded-t-2xl border-b border-gray-200">
+                 <p class="text-center font-semibold text-gray-600">Tu Asistente de Diseño Personal</p>
+            </div>
+            
+            <div class="flex flex-col flex-grow h-[65vh]">
                 <div id="chat-messages" class="flex-grow p-6 space-y-4 overflow-y-auto">
                     <div class="flex justify-start">
-                        <div class="chat-bubble chat-bubble-ai">
-                            <p class="font-bold mb-1">Asistente IA de Tati</p>
-                            ¡Hola! Soy el cotizador con IA de Tati Mapelli. ✨ Cuéntame qué accesorio de repostería, panquequera o molde te gustaría diseñar y te ayudaré a estimar su costo. ¿Qué creamos juntos hoy?
+                        <div class="chat-bubble chat-bubble-ai" style="animation-delay: 0.2s;">
+                            <p class="font-bold mb-1 text-pink-500">Asistente IA</p>
+                            ¡Hola! Soy tu asistente de diseño. 🎂 Dime qué producto de repostería o molde tienes en mente y juntos lo haremos realidad.
                         </div>
                     </div>
                 </div>
 
-                <div class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                <div class="p-4 border-t border-gray-200 bg-white/80 rounded-b-2xl">
                     <div class="flex items-center space-x-3">
-                        <input type="text" id="user-input" class="flex-grow w-full border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-300 transition" placeholder="Describe el producto que necesitas...">
-                        <button id="send-button" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 transition transform hover:scale-105">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        <input type="text" id="user-input" class="flex-grow w-full bg-gray-100 border-transparent rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-pink-300 transition" placeholder="Ej: 'Un molde para brownie de 20x30...' ">
+                        <button id="send-button" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 transition transform hover:scale-110 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
                         </button>
                     </div>
                     <p id="loading-indicator" class="text-center text-sm text-gray-500 mt-2 hidden">Escribiendo...</p>
@@ -130,24 +133,24 @@
             </div>
         </main>
         
-        <section class="w-full max-w-4xl mt-12 fade-in" style="animation-delay: 0.4s;">
-            <h2 class="font-pacifico text-3xl text-center text-pink-500 mb-8">¿Necesitas inspiración?</h2>
+        <section class="w-full max-w-5xl mt-20">
+            <h2 class="font-playfair text-3xl text-center text-gray-800 mb-10">¿Necesitas Inspiración?</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
                     <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Torta de chocolate decorada">
                     <div class="p-6">
                         <p class="text-gray-600">"¡El molde para brownie desmontable es increíble! Mis brownies salen perfectos cada vez. ¡Gracias Tati!"</p>
                         <p class="text-right font-semibold text-pink-400 mt-2">- Camila R.</p>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
                     <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Panqueques apilados">
                     <div class="p-6">
                         <p class="text-gray-600">"La panquequera a medida fue un cambio total. Ahora mis creaciones lucen súper profesionales."</p>
                         <p class="text-right font-semibold text-pink-400 mt-2">- Juan P.</p>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
                     <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Macarons de colores">
                     <div class="p-6">
                         <p class="text-gray-600">"Pedí un topper personalizado y Tati lo diseñó justo como lo imaginé. ¡La mejor calidad y servicio!"</p>
@@ -155,33 +158,51 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-8">
-                <a href="https://www.instagram.com/" target="_blank" class="text-pink-600 hover:underline">Sigue a Tati en Instagram para más creaciones</a>
+            <div class="text-center mt-12">
+                <a href="https://www.instagram.com/" target="_blank" class="text-pink-600 hover:underline font-semibold">Sigue a @TatiMapelli en Instagram</a>
             </div>
         </section>
-            <!-- Improved WhatsApp Button with White Background and Pulse -->
-            <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-10 right-10 bg-white rounded-full p-0 shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
-                <!-- Tooltip -->
-                <span class="absolute bottom-1/2 translate-y-1/2 right-full mr-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                    Escríbeme por WhatsApp
-                </span>
-                <!-- Image Icon -->
-                <img src="img/wsp.png" alt="Contactar por WhatsApp" class="h-16 w-16">
-            </a>
+
+        <!-- Improved WhatsApp Button with White Background and Pulse -->
+        <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-10 right-10 bg-white rounded-full p-0 shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
+            <!-- Tooltip -->
+            <span class="absolute bottom-1/2 translate-y-1/2 right-full mr-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                Contáctanos por WhatsApp
+            </span>
+            <!-- Image Icon -->
+            <img src="img/wsp.png" alt="Contactar por WhatsApp" class="h-12 w-12">
+        </a>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
+        // --- Particles.js Background ---
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#f8bbd0" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.3, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                "size": { "value": 3, "random": true, "anim": { "enable": false } },
+                "line_linked": { "enable": false },
+                "move": { "enable": true, "speed": 1, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false }, "resize": true } },
+            "retina_detect": true
+        });
+
+        // --- Chat Logic ---
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
         const chatMessages = document.getElementById('chat-messages');
         const loadingIndicator = document.getElementById('loading-indicator');
-
         let conversationHistory = [];
+        let messageDelay = 0;
 
         async function sendMessage() {
             const userText = userInput.value.trim();
             if (!userText) return;
-
+            
             appendMessage(userText, 'user');
             userInput.value = '';
             conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
@@ -193,10 +214,9 @@
                 const responseText = await callBackendAPI(conversationHistory);
                 appendMessage(responseText, 'ai');
                 conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
-
             } catch (error) {
                 console.error("Error calling backend API:", error);
-                appendMessage("¡Ups! Hubo un problema al conectar con el asistente. Por favor, intenta de nuevo más tarde.", 'ai');
+                appendMessage("¡Ups! Hubo un problema al conectar con el asistente. Por favor, intenta de nuevo.", 'ai');
             } finally {
                 loadingIndicator.classList.add('hidden');
                 sendButton.disabled = false;
@@ -205,7 +225,6 @@
         }
 
         async function callBackendAPI(history) {
-            // This function now calls our own backend endpoint on Vercel
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -223,31 +242,56 @@
 
         function appendMessage(text, sender) {
             const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start', 'fade-in');
+            messageWrapper.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start');
 
             const messageBubble = document.createElement('div');
             messageBubble.classList.add('chat-bubble', sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai');
+            
+            messageDelay += 150; // Stagger animation
+            messageBubble.style.animationDelay = `${messageDelay}ms`;
 
             if(sender === 'ai') {
                 const aiHeader = document.createElement('p');
-                aiHeader.classList.add('font-bold', 'mb-1');
-                aiHeader.textContent = 'Asistente IA de Tati';
+                aiHeader.classList.add('font-bold', 'mb-1', 'text-pink-500');
+                aiHeader.textContent = 'Asistente IA';
                 messageBubble.appendChild(aiHeader);
             }
             
-            let processedText = text
+            const hasButtonTag = text.includes('[BOTON_WHATSAPP]');
+            let processedText = text.replace('[BOTON_WHATSAPP]', '');
+
+            processedText = processedText
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/---/g, '<hr class="my-3 border-pink-200">');
+                .replace(/---/g, '<hr class="my-3 border-pink-100">');
 
             const messageContent = document.createElement('div');
             messageContent.innerHTML = processedText;
             messageBubble.appendChild(messageContent);
             
+            if (hasButtonTag) {
+                const quoteButton = document.createElement('button');
+                quoteButton.innerHTML = '¡Lo quiero! 🛍️';
+                quoteButton.className = 'mt-4 w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-full hover:bg-pink-600 transition-all duration-300 transform hover:scale-105';
+                
+                quoteButton.onclick = () => {
+                    // Extract the text from the quote, clean it up
+                    const quoteTextForUrl = messageContent.innerText.trim();
+                    const whatsappMessage = encodeURIComponent(`¡Hola Tati! ✨ Me gustaría encargar el producto cotizado por el asistente:\n\n${quoteTextForUrl}`);
+                    const whatsappUrl = `https://wa.me/56900000000?text=${whatsappMessage}`;
+                    window.open(whatsappUrl, '_blank');
+                };
+                
+                messageBubble.appendChild(quoteButton);
+            }
+
             messageWrapper.appendChild(messageBubble);
             chatMessages.appendChild(messageWrapper);
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Reset animation delay after a pause
+            setTimeout(() => { messageDelay = 0; }, 1000);
         }
 
         sendButton.addEventListener('click', sendMessage);
