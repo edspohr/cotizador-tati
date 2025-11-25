@@ -124,7 +124,7 @@ module.exports = async (request, response) => {
   }
   // -------------------------------------
 
-  const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+  const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   
   // Prompt diseñado para NO calcular, sino extraer JSON
   const systemPrompt = `
