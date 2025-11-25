@@ -223,7 +223,7 @@ Si es charla general, responde amable.
     <div class="quote-price">${cotizacion.precio}</div>
     <div class="quote-note">*Valor sugerido de venta (IVA incluido)*</div>
   </div>
-  <a href="https://wa.me/56900000000?text=${encodeURIComponent('Hola Tati, quiero encargar: ' + cotizacion.producto)}" target="_blank" class="quote-btn">¡Lo quiero! 🛍️</a>
+  <a href="https://wa.me/56992774939?text=${encodeURIComponent('Hola Tati, quiero encargar: ' + cotizacion.producto)}" target="_blank" class="quote-btn">¡Lo quiero! 🛍️</a>
 </div>
 
 ¿Te gustaría agregar algo más?`;
