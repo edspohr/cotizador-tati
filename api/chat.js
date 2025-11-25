@@ -8,11 +8,11 @@ module.exports = async (request, response) => {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return response.status(500).json({ error: 'API Key missing' });
+    console.error("API Key missing");
+    return response.status(500).json({ error: 'API Key missing in server' });
   }
 
   // --- LÓGICA DE NEGOCIO (PRECIOS) ---
-  // Aquí centralizamos los precios. Si algo cambia, solo editas esto.
   const PRECIOS = {
     MOLDE: {
       fijo: 22500,
@@ -43,7 +43,7 @@ module.exports = async (request, response) => {
 
     // 1. MOLDES
     if (datos.tipo === 'molde') {
-      const { largo, ancho, subtipo, divisiones, espesor } = datos; // subtipo: 'fijo' o 'desmontable'
+      const { largo, ancho, subtipo, divisiones, espesor } = datos; 
       const area = largo * ancho;
       
       let precioBase = subtipo === 'fijo' ? PRECIOS.MOLDE.fijo : PRECIOS.MOLDE.desmontable;
@@ -77,7 +77,6 @@ module.exports = async (request, response) => {
             diametroEq = d;
             descripcion = `Panquequera Redonda Ø${d}cm`;
         } else {
-            // Rectangular a equivalente
             diametroEq = 2 * Math.sqrt((l * a) / Math.PI);
             descripcion = `Panquequera Rectangular ${l}x${a}cm`;
         }
@@ -119,49 +118,50 @@ module.exports = async (request, response) => {
         producto: descripcion,
         costo: formatearMoneda(costo),
         precio: formatearMoneda(precioVenta),
-        precioNumerico: Math.round(precioVenta) // Para link de pago o similar si se necesitara
+        precioNumerico: Math.round(precioVenta)
     };
   }
-  // -------------------------------------
 
+  // ✅ CORRECCIÓN 1: Usar modelo estable gemini-1.5-flash
   const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   
-  // Prompt diseñado para NO calcular, sino extraer JSON
   const systemPrompt = `
 Eres Tati Bot 🎂, asistente de "La Tiendita de Tati Mapelli".
 Tu objetivo es guiar al cliente para cotizar: Moldes (Aluminio), Panquequeras (Acrílico), Varillas o Placas.
 
 **REGLA DE ORO: TÚ NO CALCULAS PRECIOS.**
 Tu único trabajo es conversar amablemente para obtener los datos técnicos.
-Cuando tengas TODOS los datos necesarios para un producto, en lugar de dar un precio, DEBES generar un bloque de código JSON oculto. El sistema calculará el precio por ti.
+Cuando tengas TODOS los datos necesarios para un producto, genera un JSON oculto.
 
-**Flujo de Conversación:**
+**Flujo:**
 1. Saluda y pregunta qué necesitan.
-2. Pide dimensiones (largo, ancho, alto, diámetro), tipo (fijo/desmontable) y espesor (1mm/1.5mm o 2mm/3mm) según corresponda.
-3. SIEMPRE confirma los datos antes de cotizar.
+2. Pide dimensiones, tipo y espesor.
+3. Confirma datos.
 
-**CUANDO TENGAS LOS DATOS COMPLETOS:**
-Responde con un mensaje amable diciendo "¡Perfecto! Aquí tienes tu cotización:" seguido INMEDIATAMENTE de este bloque JSON (sin markdown de código, solo el json string):
-
+**OUTPUT FINAL (JSON):**
+Responde: "¡Perfecto! Aquí tienes tu cotización:" seguido de:
 CALCULAR_JSON:{"tipo": "molde", "subtipo": "desmontable", "largo": 30, "ancho": 20, "espesor": 1.5, "divisiones": 0}
 
-**Tipos válidos para el JSON:**
-- Molde: { "tipo": "molde", "subtipo": "fijo"|"desmontable", "largo": N, "ancho": N, "espesor": 1|1.5, "divisiones": N }
-- Panquequera Redonda: { "tipo": "panquequera", "forma": "redonda", "d": N, "espesor": 2|3 }
-- Panquequera Rect: { "tipo": "panquequera", "forma": "rectangular", "l": N, "a": N, "espesor": 2|3 }
-- Varillas/Placas: { "tipo": "varillas"|"placas", "l": N, "a": N, "espesor": 2|3 }
-
-Si el usuario pregunta algo general ("¿haces envíos?", "hola"), responde normal como asistente amable.
+Si es charla general, responde amable.
 `;
 
   try {
     const { history } = request.body;
     
-    // Llamada a Gemini
     const payload = {
       contents: history,
       systemInstruction: { parts: [{ text: systemPrompt }] },
-      generationConfig: { temperature: 0.5 } // Menos temperatura para ser más preciso con el JSON
+      generationConfig: { 
+          temperature: 0.5,
+          maxOutputTokens: 500 
+      },
+      // ✅ CORRECCIÓN 2: Desactivar filtros de seguridad para evitar bloqueos falsos
+      safetySettings: [
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+      ]
     };
 
     const apiResponse = await fetch(geminiApiUrl, {
@@ -170,24 +170,34 @@ Si el usuario pregunta algo general ("¿haces envíos?", "hola"), responde norma
       body: JSON.stringify(payload),
     });
 
+    if (!apiResponse.ok) {
+        const errText = await apiResponse.text();
+        console.error("Gemini API Error:", errText);
+        return response.status(apiResponse.status).json({ error: `Error Google: ${apiResponse.status}` });
+    }
+
     const result = await apiResponse.json();
-    let text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Lo siento, tuve un error.";
+    
+    // ✅ CORRECCIÓN 3: Validación robusta de la respuesta
+    const candidate = result.candidates?.[0];
+    const text = candidate?.content?.parts?.[0]?.text;
+
+    if (!text) {
+        // Si no hay texto, vemos por qué (FinishReason)
+        console.error("Respuesta vacía de Gemini:", JSON.stringify(result, null, 2));
+        const reason = candidate?.finishReason || "UNKNOWN";
+        // Devolvemos el error al usuario para entender qué pasa
+        return response.status(200).json({ text: `(Error Técnico: Google bloqueó la respuesta. Razón: ${reason})` });
+    }
 
     // --- INTERCEPTAR Y CALCULAR ---
-    // Buscamos si el bot mandó la señal de calcular
     if (text.includes("CALCULAR_JSON:")) {
         try {
-            // Extraer el JSON string
             const jsonPart = text.split("CALCULAR_JSON:")[1].trim();
-            // Limpiar posibles caracteres extra si el bot alucina markdown
             const jsonClean = jsonPart.replace(/```json/g, '').replace(/```/g, '').trim();
-            
             const datosPedido = JSON.parse(jsonClean);
-            
-            // Ejecutar la matemática exacta
             const cotizacion = calcularCotizacion(datosPedido);
 
-            // Reconstruir la respuesta final para el usuario
             const respuestaFinal = `¡Listo! ✨ He calculado el valor exacto para tu diseño:
 
 <div class="quote-card">
@@ -200,23 +210,20 @@ Si el usuario pregunta algo general ("¿haces envíos?", "hola"), responde norma
   <a href="https://wa.me/56900000000?text=${encodeURIComponent('Hola Tati, quiero encargar: ' + cotizacion.producto)}" target="_blank" class="quote-btn">¡Lo quiero! 🛍️</a>
 </div>
 
-¿Te gustaría agregar algo más a este pedido?`;
+¿Te gustaría agregar algo más?`;
 
-            // Enviamos esto al frontend en lugar del JSON crudo
             return response.status(200).json({ text: respuestaFinal });
 
         } catch (e) {
-            console.error("Error calculando precio:", e);
-            // Fallback si falla el JSON
-            return response.status(200).json({ text: "¡Ups! Tengo los datos pero falló mi calculadora interna. Por favor avísale a Tati manualmente." });
+            console.error("Error calculando JSON:", e);
+            return response.status(200).json({ text: "¡Ups! Entendí tu pedido pero falló mi calculadora. Por favor avísale a Tati." });
         }
     }
 
-    // Si no hay cálculo, devolvemos la respuesta normal (charla)
     response.status(200).json({ text });
 
   } catch (error) {
-    console.error(error);
+    console.error("Server Error:", error);
     response.status(500).json({ error: 'Internal server error' });
   }
 };
