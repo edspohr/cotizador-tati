@@ -10,23 +10,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS BASE --- */
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #FFF0F5; /* Fondo rosado muy pálido */
+            background-color: #FFF0F5;
             background-image: radial-gradient(#ffe4e6 1px, transparent 1px);
             background-size: 20px 20px;
         }
         .font-playfair { font-family: 'Playfair Display', serif; }
-
-        /* --- CHAT CONTAINER --- */
         .chat-container {
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 40px -10px rgba(236, 72, 153, 0.2);
-            transition: all 0.3s ease;
         }
-
-        /* --- BURBUJAS DE CHAT --- */
         .chat-bubble {
             max-width: 85%;
             padding: 14px 18px;
@@ -41,23 +35,19 @@
         @keyframes popIn {
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
-
         .chat-bubble-user {
             background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
             color: white;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
         }
-
         .chat-bubble-ai {
             background-color: white;
             color: #374151;
             border-bottom-left-radius: 4px;
-            border: 1px solid #fce7f3; /* Borde rosa sutil */
+            border: 1px solid #fce7f3;
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
-
-        /* --- TARJETA DE COTIZACIÓN (Insertada por backend) --- */
         .quote-card {
             background: #fff;
             border: 2px dashed #ec4899;
@@ -99,8 +89,6 @@
             transition: transform 0.2s;
         }
         .quote-btn:hover { transform: scale(1.02); background: #db2777; }
-
-        /* --- CHIPS DE SUGERENCIA --- */
         .suggestion-chip {
             background: white;
             border: 1px solid #ec4899;
@@ -116,13 +104,9 @@
             background: #ec4899;
             color: white;
         }
-
-        /* --- SCROLLBAR --- */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        
-        /* --- ANIMACIÓN DE CARGA --- */
         .typing-indicator span {
             display: inline-block;
             width: 6px;
@@ -135,8 +119,8 @@
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-
-        /* --- WHATSAPP FLOATING BUTTON (Animación) --- */
+        
+        /* Animación Botón Flotante WhatsApp */
         @keyframes pulse-wsp {
             0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
             70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
@@ -205,11 +189,11 @@
         </div>
     </div>
 
-    <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 rounded-full p-0 w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
+    <a href="https://wa.me/56992774939?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 rounded-full p-0 w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
         <span class="absolute bottom-1/2 translate-y-1/2 right-full mr-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
             Escríbeme por WhatsApp
         </span>
-        <img src="img/wsp.png" alt="Contactar por WhatsApp" class="w-16 h-16">
+        <img src="img/wsp.png" alt="WhatsApp" class="w-16 h-16">
     </a>
 
     <script>
@@ -226,21 +210,19 @@
 
         async function sendMessage() {
             const text = userInput.value.trim();
-            if (!text) return;
+            if (!text) return; 
 
-            // 1. Mostrar mensaje usuario
             appendMessage(text, 'user');
             userInput.value = '';
             
-            // 2. Estado de carga
             loadingBubble.classList.remove('hidden');
             sendButton.disabled = true;
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
+                // Agregar al historial local
                 conversationHistory.push({ role: 'user', parts: [{ text: text }] });
                 
-                // 3. Llamada API
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -249,15 +231,16 @@
 
                 const data = await response.json();
                 
-                if (!response.ok) throw new Error(data.error);
+                if (!response.ok) throw new Error(data.error || 'Error en el servidor');
 
-                // 4. Mostrar respuesta
-                appendMessage(data.text, 'ai');
-                conversationHistory.push({ role: 'model', parts: [{ text: data.text }] });
+                const responseText = data.text || 'Sin respuesta';
+
+                appendMessage(responseText, 'ai');
+                conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
 
             } catch (error) {
                 console.error(error);
-                appendMessage("Ocurrió un error de conexión. Intenta de nuevo.", 'ai');
+                appendMessage("⚠️ Hubo un pequeño error de conexión. Por favor, intenta de nuevo.", 'ai');
             } finally {
                 loadingBubble.classList.add('hidden');
                 sendButton.disabled = false;
@@ -272,13 +255,9 @@
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`;
             
-            // Si es AI, permitir HTML (para la tarjeta de cotización)
             if (role === 'ai') {
-                // Reemplazamos saltos de línea por <br> si no es HTML complejo
                 if(!content.includes('<div')) {
-                    content = content.replace(/\n/g, '<br>');
-                    // Negritas básicas
-                    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    content = content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 }
                 bubble.innerHTML = content;
             } else {
@@ -290,6 +269,8 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
