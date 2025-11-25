@@ -135,6 +135,16 @@
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* --- WHATSAPP FLOATING BUTTON (Animación) --- */
+        @keyframes pulse-wsp {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .animate-pulse-whatsapp {
+            animation: pulse-wsp 2s infinite;
+        }
     </style>
 </head>
 <body class="text-gray-700 h-screen flex flex-col overflow-hidden">
@@ -194,6 +204,13 @@
             <div class="typing-indicator"><span></span><span></span><span></span></div>
         </div>
     </div>
+
+    <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50 rounded-full p-0 w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
+        <span class="absolute bottom-1/2 translate-y-1/2 right-full mr-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            Escríbeme por WhatsApp
+        </span>
+        <img src="img/wsp.png" alt="Contactar por WhatsApp" class="w-16 h-16">
+    </a>
 
     <script>
         const sendButton = document.getElementById('send-button');
