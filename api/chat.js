@@ -2,6 +2,7 @@
 // Vercel Serverless Function para Tati Bot
 
 module.exports = async (request, response) => {
+  // Configuración de CORS y Método
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -41,10 +42,18 @@ module.exports = async (request, response) => {
     let costo = 0;
     let descripcion = "";
 
+    // Normalización de datos para evitar errores si la IA usa nombres distintos
+    const l = Number(datos.l || datos.largo || 0);
+    const a = Number(datos.a || datos.ancho || 0);
+    const d = Number(datos.d || datos.diametro || 0);
+    const alto = Number(datos.alto || 0);
+    const espesor = datos.espesor; // Puede venir como string "3mm" o numero 3
+    const divisiones = Number(datos.divisiones || 0);
+
     // 1. MOLDES
     if (datos.tipo === 'molde') {
-      const { largo, ancho, subtipo, divisiones, espesor } = datos; 
-      const area = largo * ancho;
+      const subtipo = datos.subtipo || 'desmontable';
+      const area = l * a;
       
       let precioBase = subtipo === 'fijo' ? PRECIOS.MOLDE.fijo : PRECIOS.MOLDE.desmontable;
       
@@ -55,36 +64,42 @@ module.exports = async (request, response) => {
       }
 
       // Divisiones
-      const costoDiv = (divisiones || 0) * PRECIOS.MOLDE.division;
+      const costoDiv = divisiones * PRECIOS.MOLDE.division;
 
       let costoTotal = precioBase + ajusteTamano + costoDiv;
 
       // Espesor (Reforzado)
-      if (espesor === '1.5mm' || espesor === 1.5) {
+      if (String(espesor).includes('1.5') || espesor === 1.5) {
         costoTotal *= PRECIOS.MOLDE.factorReforzado;
       }
       
       costo = costoTotal;
-      descripcion = `Molde ${subtipo} de ${largo}x${ancho}cm` + (divisiones ? ` con ${divisiones} divisiones` : "") + ` (${espesor}mm)`;
+      descripcion = `Molde ${subtipo} de ${l}x${a}x${alto || 10}cm` + (divisiones ? ` con ${divisiones} divisiones` : "") + ` (${espesor}mm)`;
     }
 
     // 2. PANQUEQUERAS
     else if (datos.tipo === 'panquequera') {
-        const { forma, d, l, a, espesor } = datos;
+        const forma = datos.forma || 'rectangular';
         let diametroEq = 0;
 
         if (forma === 'redonda') {
             diametroEq = d;
             descripcion = `Panquequera Redonda Ø${d}cm`;
         } else {
-            diametroEq = 2 * Math.sqrt((l * a) / Math.PI);
-            descripcion = `Panquequera Rectangular ${l}x${a}cm`;
+            // Rectangular a equivalente
+            if(l > 0 && a > 0) {
+                diametroEq = 2 * Math.sqrt((l * a) / Math.PI);
+                descripcion = `Panquequera Rectangular ${l}x${a}cm`;
+            } else {
+                diametroEq = 0; // Prevenir error
+                descripcion = `Panquequera (Medidas no detectadas)`;
+            }
         }
 
         let base = (PRECIOS.PANQUEQUERA.factorDiametro * diametroEq) - PRECIOS.PANQUEQUERA.restaBase;
         if (base < PRECIOS.PANQUEQUERA.minimo) base = PRECIOS.PANQUEQUERA.minimo;
 
-        if (espesor === '3mm' || espesor === 3) {
+        if (String(espesor).includes('3') || espesor === 3) {
             base *= PRECIOS.PANQUEQUERA.factorEspesor3mm;
         }
         costo = base;
@@ -93,7 +108,6 @@ module.exports = async (request, response) => {
 
     // 3. VARILLAS / PLACAS
     else if (datos.tipo === 'varillas' || datos.tipo === 'placas') {
-        const { l, a, espesor } = datos;
         const area = l * a;
         let base = 0;
         
@@ -105,7 +119,7 @@ module.exports = async (request, response) => {
             descripcion = `Placa de Acrílico ${l}x${a}cm`;
         }
 
-        if (espesor === '3mm' || espesor === 3) {
+        if (String(espesor).includes('3') || espesor === 3) {
             base *= (datos.tipo === 'varillas' ? PRECIOS.VARILLAS.factorEspesor3mm : PRECIOS.PLACAS.factorEspesor3mm);
         }
         costo = base;
@@ -122,24 +136,29 @@ module.exports = async (request, response) => {
     };
   }
 
-  // ✅ CORRECCIÓN 1: Usar modelo estable gemini-1.5-flash
+  // CONFIGURACIÓN DE MODELO GEMINI (Versión Estable)
   const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  
   const systemPrompt = `
 Eres Tati Bot 🎂, asistente de "La Tiendita de Tati Mapelli".
 Tu objetivo es guiar al cliente para cotizar: Moldes (Aluminio), Panquequeras (Acrílico), Varillas o Placas.
 
 **REGLA DE ORO: TÚ NO CALCULAS PRECIOS.**
-Tu único trabajo es conversar amablemente para obtener los datos técnicos.
-Cuando tengas TODOS los datos necesarios para un producto, genera un JSON oculto.
+Tu único trabajo es obtener los datos técnicos.
+Cuando tengas TODOS los datos, genera un JSON oculto.
 
 **Flujo:**
 1. Saluda y pregunta qué necesitan.
-2. Pide dimensiones, tipo y espesor.
+2. Pide dimensiones (largo, ancho, alto o diámetro), tipo y espesor.
 3. Confirma datos.
 
 **OUTPUT FINAL (JSON):**
 Responde: "¡Perfecto! Aquí tienes tu cotización:" seguido de:
 CALCULAR_JSON:{"tipo": "molde", "subtipo": "desmontable", "largo": 30, "ancho": 20, "espesor": 1.5, "divisiones": 0}
+
+**Ejemplos de JSON:**
+- Panquequera: {"tipo": "panquequera", "forma": "rectangular", "largo": 20, "ancho": 20, "espesor": 3}
+- Molde: {"tipo": "molde", "largo": 20, "ancho": 20, "alto": 10, "espesor": 1.5}
 
 Si es charla general, responde amable.
 `;
@@ -154,7 +173,6 @@ Si es charla general, responde amable.
           temperature: 0.5,
           maxOutputTokens: 500 
       },
-      // ✅ CORRECCIÓN 2: Desactivar filtros de seguridad para evitar bloqueos falsos
       safetySettings: [
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
         { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
@@ -172,20 +190,17 @@ Si es charla general, responde amable.
     if (!apiResponse.ok) {
         const errText = await apiResponse.text();
         console.error("Gemini API Error:", errText);
-        return response.status(apiResponse.status).json({ error: `Error Google: ${apiResponse.status}` });
+        // Si el modelo 2.5 falla, sugiere revisar la cuota o el modelo
+        return response.status(apiResponse.status).json({ error: `Error Google: ${apiResponse.status} - Verifica el modelo o la cuota.` });
     }
 
     const result = await apiResponse.json();
-    
-    // ✅ CORRECCIÓN 3: Validación robusta de la respuesta
     const candidate = result.candidates?.[0];
     const text = candidate?.content?.parts?.[0]?.text;
 
     if (!text) {
-        // Si no hay texto, vemos por qué (FinishReason)
-        console.error("Respuesta vacía de Gemini:", JSON.stringify(result, null, 2));
+        console.error("Respuesta vacía:", JSON.stringify(result, null, 2));
         const reason = candidate?.finishReason || "UNKNOWN";
-        // Devolvemos el error al usuario para entender qué pasa
         return response.status(200).json({ text: `(Error Técnico: Google bloqueó la respuesta. Razón: ${reason})` });
     }
 
@@ -193,8 +208,10 @@ Si es charla general, responde amable.
     if (text.includes("CALCULAR_JSON:")) {
         try {
             const jsonPart = text.split("CALCULAR_JSON:")[1].trim();
+            // Limpieza extra por si el bot agrega markdown ```json ... ```
             const jsonClean = jsonPart.replace(/```json/g, '').replace(/```/g, '').trim();
             const datosPedido = JSON.parse(jsonClean);
+            
             const cotizacion = calcularCotizacion(datosPedido);
 
             const respuestaFinal = `¡Listo! ✨ He calculado el valor exacto para tu diseño:
@@ -214,8 +231,8 @@ Si es charla general, responde amable.
             return response.status(200).json({ text: respuestaFinal });
 
         } catch (e) {
-            console.error("Error calculando JSON:", e);
-            return response.status(200).json({ text: "¡Ups! Entendí tu pedido pero falló mi calculadora. Por favor avísale a Tati." });
+            console.error("Error procesando JSON:", e);
+            return response.status(200).json({ text: "¡Ups! Tengo los datos pero hubo un error calculando el precio final. Por favor contacta a Tati directamente." });
         }
     }
 
