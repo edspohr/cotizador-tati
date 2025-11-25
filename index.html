@@ -8,277 +8,274 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
+        /* --- ESTILOS BASE --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F7F7F9; /* Near-white, clean background */
+            font-family: 'Nunito', sans-serif;
+            background-color: #FFF0F5; /* Fondo rosado muy pálido */
+            background-image: radial-gradient(#ffe4e6 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        .font-playfair {
-            font-family: 'Playfair Display', serif;
-        }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        /* --- CHAT CONTAINER --- */
         .chat-container {
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px -10px rgba(236, 72, 153, 0.2);
             transition: all 0.3s ease;
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
         }
-        .chat-header {
-            background-color: #ffffff;
-        }
+
+        /* --- BURBUJAS DE CHAT --- */
         .chat-bubble {
-            max-width: 80%;
-            padding: 14px 20px;
-            border-radius: 22px;
-            word-wrap: break-word;
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             opacity: 0;
-            transform: translateY(15px);
-            animation: popIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        /* High-contrast user bubble */
-        .chat-bubble-user {
-            background-color: #ec4899; /* Vibrant pink */
-            color: #ffffff; /* White text */
-            border-bottom-right-radius: 6px;
-        }
-        /* High-contrast AI bubble */
-        .chat-bubble-ai {
-            background-color: #ffffff;
-            color: #1f2937; /* Darker gray text */
-            border: 1px solid #e5e7eb; /* Slightly darker border */
-            border-bottom-left-radius: 6px;
+            transform: scale(0.9) translateY(10px);
         }
         @keyframes popIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        #chat-messages::-webkit-scrollbar {
-            width: 5px;
+
+        .chat-bubble-user {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
         }
-        #chat-messages::-webkit-scrollbar-track {
-            background: transparent;
+
+        .chat-bubble-ai {
+            background-color: white;
+            color: #374151;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #fce7f3; /* Borde rosa sutil */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
-        #chat-messages::-webkit-scrollbar-thumb {
-            background: #e0e0e0;
-            border-radius: 10px;
+
+        /* --- TARJETA DE COTIZACIÓN (Insertada por backend) --- */
+        .quote-card {
+            background: #fff;
+            border: 2px dashed #ec4899;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 10px;
+            text-align: center;
         }
-        .inspiration-card {
-             transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .quote-header {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ec4899;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        .inspiration-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
+        .quote-body {
+            background: #fdf2f8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
-        /* WhatsApp Button Pulse Animation */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-            }
+        .quote-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin: 5px 0;
+            font-family: 'Playfair Display', serif;
         }
-        .animate-pulse-whatsapp {
-            animation: pulse 2s infinite;
+        .quote-note { font-size: 0.75rem; color: #6b7280; }
+        .quote-btn {
+            display: block;
+            background: #ec4899;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.2s;
         }
+        .quote-btn:hover { transform: scale(1.02); background: #db2777; }
+
+        /* --- CHIPS DE SUGERENCIA --- */
+        .suggestion-chip {
+            background: white;
+            border: 1px solid #ec4899;
+            color: #ec4899;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .suggestion-chip:hover {
+            background: #ec4899;
+            color: white;
+        }
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        
+        /* --- ANIMACIÓN DE CARGA --- */
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            margin: 0 1px;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-700 h-screen flex flex-col overflow-hidden">
 
-    <div class="container mx-auto p-4 md:p-8 min-h-screen flex flex-col items-center relative z-10">
-
-        <header class="w-full max-w-5xl flex flex-col items-start text-left md:flex-row md:items-center py-8 mb-4">
-            <!-- Logo without circle -->
-            <img src="img/logo.svg" alt="Logo Tati Mapelli" class="w-28 md:w-32 mb-4 md:mb-0 md:mr-8">
+    <header class="w-full bg-white/80 backdrop-blur-md border-b border-pink-100 py-3 px-6 flex items-center justify-between z-20">
+        <div class="flex items-center">
+            <img src="img/logo.svg" alt="Tati Mapelli" class="h-10 w-auto mr-3">
             <div>
-                <h1 class="font-playfair text-4xl md:text-5xl text-gray-800">Cotizador IA</h1>
-                <p class="text-md text-gray-500 mt-2">Herramientas y accesorios para resultados perfectos en tu repostería.</p>
+                <h1 class="font-playfair text-xl text-gray-800 font-bold leading-tight">Cotizador IA</h1>
+                <p class="text-xs text-pink-500 font-semibold">Tati Mapelli</p>
             </div>
-        </header>
+        </div>
+        <a href="https://tienditatatimapelli.cl/" class="text-sm text-gray-500 hover:text-pink-500 transition">Volver a Tienda</a>
+    </header>
 
-        <main class="w-full max-w-3xl flex-grow flex flex-col bg-white/70 backdrop-blur-sm rounded-2xl chat-container border border-gray-200/50 shadow-2xl">
-            
-            <div class="chat-header p-4 rounded-t-2xl border-b border-gray-200">
-                 <p class="text-center font-semibold text-gray-600">Tu Asistente de Diseño Personal</p>
-            </div>
-            
-            <div class="flex flex-col flex-grow h-[65vh]">
-                <div id="chat-messages" class="flex-grow p-6 space-y-4 overflow-y-auto">
-                    <div class="flex justify-start">
-                        <div class="chat-bubble chat-bubble-ai" style="animation-delay: 0.2s;">
-                            <p class="font-bold mb-1 text-pink-500">Tati Bot</p>
-                            ¡Hola! Soy tu asistente de diseño. 🎂 Cuéntame qué herramienta o accesorio necesitas para lograr resultados perfectos en tu repostería y te ayudaré a diseñarlo.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-gray-200 bg-white/80 rounded-b-2xl">
-                    <div class="flex items-center space-x-3">
-                        <input type="text" id="user-input" class="flex-grow w-full bg-gray-100 border-transparent rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-pink-300 transition" placeholder="Ej: 'Un molde para brownie de 20x30...' ">
-                        <button id="send-button" class="bg-pink-500 text-white rounded-full p-3 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 transition transform hover:scale-110 active:scale-95">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" /></svg>
-                        </button>
-                    </div>
-                    <p id="loading-indicator" class="text-center text-sm text-gray-500 mt-2 hidden">Escribiendo...</p>
-                </div>
-            </div>
-        </main>
+    <main class="flex-grow container mx-auto max-w-2xl flex flex-col relative z-10 p-2 md:p-4 h-full">
         
-        <section class="w-full max-w-5xl mt-20">
-            <h2 class="font-playfair text-3xl text-center text-gray-800 mb-10">¿Necesitas Inspiración?</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
-                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/1055272/pexels-photo-1055272.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Torta de chocolate decorada">
-                    <div class="p-6">
-                        <p class="text-gray-600">"¡El molde para brownie desmontable es increíble! Mis brownies salen perfectos cada vez. ¡Gracias Tati!"</p>
-                        <p class="text-right font-semibold text-pink-400 mt-2">- Camila R.</p>
-                    </div>
-                </div>
-                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
-                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/2144200/pexels-photo-2144200.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Panqueques apilados">
-                    <div class="p-6">
-                        <p class="text-gray-600">"La panquequera a medida fue un cambio total. Ahora mis creaciones lucen súper profesionales."</p>
-                        <p class="text-right font-semibold text-pink-400 mt-2">- Juan P.</p>
-                    </div>
-                </div>
-                <div class="inspiration-card bg-white rounded-xl shadow-md overflow-hidden">
-                    <img class="h-56 w-full object-cover" src="https://images.pexels.com/photos/140831/pexels-photo-140831.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Macarons de colores">
-                    <div class="p-6">
-                        <p class="text-gray-600">"Pedí un topper personalizado y Tati lo diseñó justo como lo imaginé. ¡La mejor calidad y servicio!"</p>
-                        <p class="text-right font-semibold text-pink-400 mt-2">- Sofía L.</p>
-                    </div>
+        <div id="chat-messages" class="flex-grow overflow-y-auto space-y-4 px-2 pb-4">
+            <div class="flex justify-start">
+                <div class="chat-bubble chat-bubble-ai">
+                    <p class="font-bold text-pink-500 mb-1">Tati Bot ✨</p>
+                    ¡Hola! Soy tu asistente de diseño. 🎂 ¿Qué tienes en mente hoy?
+                    <ul class="mt-2 text-sm space-y-1 list-disc list-inside text-gray-600">
+                        <li>Moldes a medida (Aluminio)</li>
+                        <li>Panquequeras (Acrílico)</li>
+                        <li>Varillas y Placas</li>
+                    </ul>
                 </div>
             </div>
-            <div class="text-center mt-12">
-                <a href="https://tienditatatimapelli.cl/" target="_blank" class="text-pink-600 hover:underline font-semibold">Volver a la Tiendita de Tati Mapelli</a>
-            </div>
-        </section>
+        </div>
 
-        <!-- WhatsApp Button: No background, image fills the space -->
-        <a href="https://wa.me/56900000000?text=Hola%20Tati,%20necesito%20ayuda%20con%20un%20producto%20personalizado" target="_blank" class="group fixed bottom-8 right-8 rounded-full p-0 w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl animate-pulse-whatsapp">
-            <!-- Tooltip -->
-            <span class="absolute bottom-1/2 translate-y-1/2 right-full mr-4 px-3 py-1.5 bg-gray-800 text-white text-sm font-semibold rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Escríbeme por WhatsApp
-            </span>
-            <!-- Image Icon -->
-            <img src="img/wsp.png" alt="Contactar por WhatsApp" class="w-16 h-16">
-        </a>
+        <div class="mt-auto">
+            <div class="flex gap-2 overflow-x-auto pb-2 px-1 mb-1 no-scrollbar" id="suggestion-container">
+                <button class="suggestion-chip" onclick="sendSuggestion('Cotizar un molde rectangular')">🎂 Molde Rectangular</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Necesito una panquequera')">🥞 Panquequera</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Varillas niveladoras')">📏 Varillas</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Diseño personalizado')">✨ Otro</button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg border border-pink-100 p-2 flex items-center gap-2">
+                <input type="text" id="user-input" 
+                    class="flex-grow bg-transparent border-none px-4 py-3 focus:outline-none text-gray-700 placeholder-gray-400" 
+                    placeholder="Escribe aquí tu idea..." autocomplete="off">
+                
+                <button id="send-button" class="bg-pink-500 text-white rounded-xl p-3 hover:bg-pink-600 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-2 pb-2">Diseños únicos para resultados perfectos.</p>
+        </div>
+    </main>
+
+    <div id="loading-bubble" class="hidden absolute bottom-24 left-8 z-20">
+        <div class="chat-bubble chat-bubble-ai shadow-lg py-2 px-4">
+            <div class="typing-indicator"><span></span><span></span><span></span></div>
+        </div>
     </div>
 
     <script>
-        // --- Chat Logic ---
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
         const chatMessages = document.getElementById('chat-messages');
-        const loadingIndicator = document.getElementById('loading-indicator');
+        const loadingBubble = document.getElementById('loading-bubble');
         let conversationHistory = [];
-        let messageDelay = 0;
+
+        function sendSuggestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
 
         async function sendMessage() {
-            const userText = userInput.value.trim();
-            if (!userText) return;
-            
-            appendMessage(userText, 'user');
-            userInput.value = '';
-            conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
+            const text = userInput.value.trim();
+            if (!text) return;
 
-            loadingIndicator.classList.remove('hidden');
+            // 1. Mostrar mensaje usuario
+            appendMessage(text, 'user');
+            userInput.value = '';
+            
+            // 2. Estado de carga
+            loadingBubble.classList.remove('hidden');
             sendButton.disabled = true;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                const responseText = await callBackendAPI(conversationHistory);
-                appendMessage(responseText, 'ai');
-                conversationHistory.push({ role: 'model', parts: [{ text: responseText }] });
+                conversationHistory.push({ role: 'user', parts: [{ text: text }] });
+                
+                // 3. Llamada API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: conversationHistory }),
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.error);
+
+                // 4. Mostrar respuesta
+                appendMessage(data.text, 'ai');
+                conversationHistory.push({ role: 'model', parts: [{ text: data.text }] });
+
             } catch (error) {
-                console.error("Error calling backend API:", error);
-                appendMessage("¡Ups! Hubo un problema al conectar con el asistente. Por favor, intenta de nuevo.", 'ai');
+                console.error(error);
+                appendMessage("Ocurrió un error de conexión. Intenta de nuevo.", 'ai');
             } finally {
-                loadingIndicator.classList.add('hidden');
+                loadingBubble.classList.add('hidden');
                 sendButton.disabled = false;
                 userInput.focus();
             }
         }
 
-        async function callBackendAPI(history) {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Server responded with ${response.status}`);
+        function appendMessage(content, role) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}`;
+            
+            // Si es AI, permitir HTML (para la tarjeta de cotización)
+            if (role === 'ai') {
+                // Reemplazamos saltos de línea por <br> si no es HTML complejo
+                if(!content.includes('<div')) {
+                    content = content.replace(/\n/g, '<br>');
+                    // Negritas básicas
+                    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                }
+                bubble.innerHTML = content;
+            } else {
+                bubble.textContent = content;
             }
 
-            const data = await response.json();
-            return data.text;
-        }
-
-        function appendMessage(text, sender) {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('flex', sender === 'user' ? 'justify-end' : 'justify-start');
-
-            const messageBubble = document.createElement('div');
-            messageBubble.classList.add('chat-bubble', sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai');
-            
-            messageDelay += 150; // Stagger animation
-            messageBubble.style.animationDelay = `${messageDelay}ms`;
-
-            if(sender === 'ai') {
-                const aiHeader = document.createElement('p');
-                aiHeader.classList.add('font-bold', 'mb-1', 'text-pink-500');
-                aiHeader.textContent = 'Tati Bot';
-                messageBubble.appendChild(aiHeader);
-            }
-            
-            const hasButtonTag = text.includes('[BOTON_WHATSAPP]');
-            let processedText = text.replace('[BOTON_WHATSAPP]', '');
-
-            processedText = processedText
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/---/g, '<hr class="my-3 border-pink-100">');
-
-            const messageContent = document.createElement('div');
-            messageContent.innerHTML = processedText;
-            messageBubble.appendChild(messageContent);
-            
-            if (hasButtonTag) {
-                const quoteButton = document.createElement('button');
-                quoteButton.innerHTML = '¡Lo quiero! 🛍️';
-                quoteButton.className = 'mt-4 w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-full hover:bg-pink-600 transition-all duration-300 transform hover:scale-105';
-                
-                quoteButton.onclick = () => {
-                    // Extract the text from the quote, clean it up
-                    const quoteTextForUrl = messageContent.innerText.trim();
-                    const whatsappMessage = encodeURIComponent(`¡Hola Tati! ✨ Me gustaría encargar el producto cotizado por el asistente:\n\n${quoteTextForUrl}`);
-                    const whatsappUrl = `https://wa.me/56900000000?text=${whatsappMessage}`;
-                    window.open(whatsappUrl, '_blank');
-                };
-                
-                messageBubble.appendChild(quoteButton);
-            }
-
-            messageWrapper.appendChild(messageBubble);
-            chatMessages.appendChild(messageWrapper);
-
+            wrapper.appendChild(bubble);
+            chatMessages.appendChild(wrapper);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Reset animation delay after a pause
-            setTimeout(() => { messageDelay = 0; }, 1000);
         }
 
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
 </body>
 </html>
-
