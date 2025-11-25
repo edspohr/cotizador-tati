@@ -123,8 +123,7 @@ module.exports = async (request, response) => {
   }
 
   // ✅ CORRECCIÓN 1: Usar modelo estable gemini-1.5-flash
-  const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  
+  const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;  
   const systemPrompt = `
 Eres Tati Bot 🎂, asistente de "La Tiendita de Tati Mapelli".
 Tu objetivo es guiar al cliente para cotizar: Moldes (Aluminio), Panquequeras (Acrílico), Varillas o Placas.
